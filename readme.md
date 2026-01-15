@@ -33,6 +33,23 @@ Those steps are handled by **project-level scripts**.
 
 ---
 
+## ✅ Supported Systems
+
+This bootstrap pipeline supports:
+
+- Ubuntu 20.04 LTS
+- Ubuntu 22.04 LTS
+- Ubuntu 24.04 LTS
+
+Providers tested:
+
+- DigitalOcean VPS
+- AWS EC2 (Ubuntu AMI)
+- Hostinger VPS
+- Vultr / Hetzner
+
+---
+
 ## 🧱 Architecture
 
 You will use **two repositories**:
