@@ -140,7 +140,7 @@ After VPS setup, deployment depends on your project framework.
 
 Follow the appropriate guide:
 
-- 🟢 Django Projects → docs/django-deploy.md
+- 🟢 Django Projects → [docs/django-deploy.md](https://github.com/rajsolodev/pykits-dev-deploy/blob/main/docs/django.md)
 - 🔵 FastAPI Projects → Coming soon
 - 🟣 Node.js Projects → coming soon
 
