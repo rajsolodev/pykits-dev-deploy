@@ -92,7 +92,7 @@ if confirm("Install Docker (official repo)?"):
   run(
         'echo "Types: deb\n'
         'URIs: https://download.docker.com/linux/ubuntu\n'
-        'Suites: $(. /etc/os-release && echo \\"${UBUNTU_CODENAME:-$VERSION_CODENAME}\\")\n'
+        'Suites: jammy\n'
         'Components: stable\n'
         'Signed-By: /etc/apt/keyrings/docker.asc" '
         '| sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null'
