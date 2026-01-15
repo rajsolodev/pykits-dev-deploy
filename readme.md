@@ -111,7 +111,7 @@ apt install -y git python3
 ### STEP 3 --- Create secure sudo deploy user
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create_sudo_user.py | python3
+curl -fsSL "https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create_sudo_user.py?$(date +%s)" | python3
 ```
 
 You will be asked to:

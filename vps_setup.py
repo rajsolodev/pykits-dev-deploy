@@ -89,15 +89,14 @@ if confirm("Install Docker (official repo)?"):
   run("curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc", sudo=True)
   run("chmod a+r /etc/apt/keyrings/docker.asc", sudo=True)
 
-  run("""
-    bash -c 'cat > /etc/apt/sources.list.d/docker.sources << EOF
-    Types: deb
-    URIs: https://download.docker.com/linux/ubuntu
-    Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-    Components: stable
-    Signed-By: /etc/apt/keyrings/docker.asc
-    EOF'
-    """, sudo=True)
+  run(
+        'echo "Types: deb\n'
+        'URIs: https://download.docker.com/linux/ubuntu\n'
+        'Suites: $(. /etc/os-release && echo \\"${UBUNTU_CODENAME:-$VERSION_CODENAME}\\")\n'
+        'Components: stable\n'
+        'Signed-By: /etc/apt/keyrings/docker.asc" '
+        '| sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null'
+    )
 
   run("apt update", sudo=True)
   run(
