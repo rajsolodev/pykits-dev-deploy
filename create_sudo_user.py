@@ -22,9 +22,10 @@ print("""
 """)
 
 username = prompt("Enter new username: ")
+password = prompt("Enter password: ")
 
-if not username:
-    print("❌ Username cannot be empty")
+if not username or not password:
+    print("❌ Username and password required")
     sys.exit(1)
 
 # Check if user exists
@@ -38,10 +39,13 @@ if result.returncode == 0:
     print("❌ User already exists")
     sys.exit(1)
 
-print("\nYou will now be asked to set password for the user.")
-run(f"adduser {username}")
+print("\nCreating user (non-interactive)...")
+run(f"useradd -m -s /bin/bash {username}")
 
-print("\nAdding user to sudo group...")
+print("Setting password...")
+run(f'echo "{username}:{password}" | chpasswd')
+
+print("Adding user to sudo group...")
 run(f"usermod -aG sudo {username}")
 
 print(f"""
@@ -57,5 +61,6 @@ Next Steps:
 2. Login with new user:
    ssh {username}@YOUR_VPS_IP
 
-3. Then run vps_setup.py script as this user.
+3. Then run VPS setup:
+   curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps_setup.py | python3
 """)
