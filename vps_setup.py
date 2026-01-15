@@ -4,7 +4,7 @@ from pathlib import Path
 
 def run(cmd, sudo=False):
     if sudo:
-        cmd = "sudo " + cmd
+        cmd = f'sudo bash -c "{cmd}"'
     print(f"\n▶ {cmd}")
     subprocess.run(cmd, shell=True, check=True)
 
