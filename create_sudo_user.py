@@ -12,7 +12,7 @@ def prompt(msg):
         return tty.readline().strip()
 
 if os.geteuid() != 0:
-    print("❌ Run as root")
+    print(" Run as root")
     sys.exit(1)
 
 print("""
@@ -25,7 +25,7 @@ username = prompt("Enter new username: ")
 password = prompt("Enter password: ")
 
 if not username or not password:
-    print("❌ Username and password required")
+    print(" Username and password required")
     sys.exit(1)
 
 # Check if user exists
@@ -36,7 +36,7 @@ result = subprocess.run(
 )
 
 if result.returncode == 0:
-    print("❌ User already exists")
+    print(" User already exists")
     sys.exit(1)
 
 print("\nCreating user (non-interactive)...")

@@ -8,8 +8,14 @@ def run(cmd, sudo=False):
     print(f"\n▶ {cmd}")
     subprocess.run(cmd, shell=True, check=True)
 
+def prompt(msg):
+    print(msg, end="", flush=True)
+    with open("/dev/tty") as tty:
+        return tty.readline().strip()
+
 def confirm(msg):
-    return input(f"\n{msg} (y/n): ").strip().lower() == "y"
+    ans = prompt(f"\n{msg} (y/n): ").lower()
+    return ans == "y"
 
 print("""
 ========================================
@@ -18,12 +24,16 @@ print("""
 ========================================
 """)
 
+if os.geteuid() == 0:
+    print(" Do NOT run as root. Run as new user with sudo access.")
+    exit(1)
+
 # -------------------------
 # Project Info
 # -------------------------
-project = input("Project name (e.g. digistore): ").strip()
-github_user = input("GitHub username/org: ").strip()
-repo_name = input("Repo name: ").strip()
+project = prompt("Project name (e.g. digistore): ")
+github_user = prompt("GitHub username/org: ")
+repo_name = prompt("Repo name: ")
 
 home = Path.home()
 target_path = home / project
@@ -110,12 +120,9 @@ Host {host_alias}
     IdentitiesOnly yes
 """
 
-if config_path.exists():
-    text = config_path.read_text()
-else:
-    text = ""
+existing = config_path.read_text() if config_path.exists() else ""
 
-if host_alias not in text:
+if host_alias not in existing:
     if confirm("Add SSH config host entry?"):
         with open(config_path, "a") as f:
             f.write(config_entry)
