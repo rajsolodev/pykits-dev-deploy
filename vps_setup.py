@@ -160,7 +160,33 @@ print(" ADD THIS KEY TO GITHUB DEPLOY KEYS")
 print("==============================\n")
 run(f'cat "{key_path}.pub"')
 
-input("\n Add key in GitHub repo → Deploy Keys, then press ENTER...")
+print("""
+👉 STEP REQUIRED:
+
+1. Open your GitHub repo
+2. Go to: Settings → Deploy Keys
+3. Click: Add deploy key
+4. Paste the above public key
+5. Enable: Allow write access (if needed)
+""")
+
+while True:
+    confirm_word = prompt("Type CLONED after adding the key: ").strip().upper()
+    if confirm_word == "CLONED":
+        break
+    print(" Please type CLONED only after adding the deploy key.")
+
+print("\nTesting SSH connection to GitHub...")
+result = subprocess.run(
+    f"ssh -T {host_alias}",
+    shell=True
+)
+
+if result.returncode != 1:
+    print(" SSH connection failed. Check deploy key setup.")
+    exit(1)
+
+print("✅ SSH authentication successful.")
 
 # -------------------------
 # Clone Repo
