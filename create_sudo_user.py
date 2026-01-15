@@ -6,8 +6,12 @@ def run(cmd):
     print(f"\n▶ {cmd}")
     subprocess.run(cmd, shell=True, check=True)
 
+def prompt(msg):
+    # Always read from real terminal, even if piped
+    return input(msg) if sys.stdin.isatty() else open("/dev/tty").readline().strip()
+
 if os.geteuid() != 0:
-    print("Run as root: sudo python3 create_sudo_user.py")
+    print("Run as root")
     sys.exit(1)
 
 print("""
@@ -16,7 +20,8 @@ print("""
 ========================================
 """)
 
-username = input("Enter new username: ").strip()
+print("Enter new username:")
+username = prompt("> ").strip()
 
 if not username:
     print("Username cannot be empty")
@@ -34,7 +39,7 @@ run(f"adduser {username}")
 print("\nAdding user to sudo group...")
 run(f"usermod -aG sudo {username}")
 
-print("""
+print(f"""
 ========================================
   USER CREATED SUCCESSFULLY
 ========================================
@@ -48,4 +53,4 @@ Next Steps:
    ssh {username}@YOUR_VPS_IP
 
 3. Then run vps_setup.py script as this user.
-""".format(username=username))
+""")

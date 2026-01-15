@@ -82,14 +82,11 @@ ssh root@YOUR_VPS_IP
 
 ---
 
-### STEP 2 --- Install minimal tools + clone deploy repo
+### STEP 2 --- Install minimal tools
 
 ```bash
 apt update
 apt install -y git python3
-
-git clone https://github.com/rajsolodev/pykits-dev-deploy.git
-cd pykits-dev-deploy
 ```
 
 ---
@@ -97,7 +94,7 @@ cd pykits-dev-deploy
 ### STEP 3 --- Create secure sudo deploy user
 
 ```bash
-python3 create_sudo_user.py
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create_sudo_user.py | python3
 ```
 
 You will be asked to:
@@ -114,7 +111,16 @@ ssh username@YOUR_VPS_IP
 
 ---
 
-### STEP 4 --- Setup VPS + Clone PRIVATE project repo
+### Step 4 --- Clone Deployment Script
+
+```bash
+git clone https://github.com/rajsolodev/pykits-dev-deploy.git
+cd pykits-dev-deploy
+```
+
+---
+
+### STEP 5 --- Setup VPS + Auto Clone PRIVATE project repo
 
 Login as new user, then:
 
