@@ -97,7 +97,7 @@ if confirm("Install Docker (official repo)?"):
   run(
         'echo "Types: deb\n'
         'URIs: https://download.docker.com/linux/ubuntu\n'
-        'Suites: jammy\n'
+        'Suites: jammy\n'       # isko indepened banana hoga
         'Components: stable\n'
         'Signed-By: /etc/apt/keyrings/docker.asc" '
         '| sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null'
@@ -171,10 +171,10 @@ print("""
 """)
 
 while True:
-    confirm_word = prompt("Type CLONED after adding the key: ").strip().upper()
-    if confirm_word == "CLONED":
+    confirm_word = prompt("Type CLONE after adding the key: ").strip().upper()
+    if confirm_word == "CLONE":
         break
-    print(" Please type CLONED only after adding the deploy key.")
+    print(" Please type CLONE only after adding the deploy key.")
 
 print("\nTesting SSH connection to GitHub...")
 result = subprocess.run(
@@ -186,7 +186,7 @@ if result.returncode != 1:
     print(" SSH connection failed. Check deploy key setup.")
     exit(1)
 
-print("✅ SSH authentication successful.")
+print("SSH authentication successful.")
 
 # -------------------------
 # Clone Repo
