@@ -128,22 +128,13 @@ ssh username@YOUR_VPS_IP
 
 ---
 
-### Step 4 --- Clone Deployment Script
-
-```bash
-git clone https://github.com/rajsolodev/pykits-dev-deploy.git
-cd pykits-dev-deploy
-```
-
----
 
 ### STEP 5 --- Setup VPS + Auto Clone PRIVATE project repo
 
 Login as new user, then:
 
 ```bash
-cd pykits-dev-deploy
-python3 vps_setup.py
+curl -fsSL "https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps_setup.py?$(date +%s)" | python3
 ```
 
 This script will:
