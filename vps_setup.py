@@ -2,6 +2,10 @@ import os
 import subprocess
 from pathlib import Path
 
+def fix_broken_docker_repo():
+    print("\n🧹 Checking for broken Docker repo...")
+    run("rm -f /etc/apt/sources.list.d/docker.sources", sudo=True)
+
 def run(cmd, sudo=False):
     if sudo:
         cmd = f'sudo bash -c "{cmd}"'
@@ -48,6 +52,7 @@ host_alias = f"github-{project}"
 # System Update
 # -------------------------
 if confirm("Run system update & upgrade?"):
+    fix_broken_docker_repo()
     run(
         "DEBIAN_FRONTEND=noninteractive "
         "apt update && "
