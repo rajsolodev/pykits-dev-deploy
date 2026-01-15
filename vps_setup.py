@@ -48,13 +48,24 @@ host_alias = f"github-{project}"
 # System Update
 # -------------------------
 if confirm("Run system update & upgrade?"):
-    run("apt update && apt upgrade -y", sudo=True)
+    run(
+        "DEBIAN_FRONTEND=noninteractive "
+        "apt update && "
+        "apt upgrade -y "
+        "-o Dpkg::Options::=--force-confdef "
+        "-o Dpkg::Options::=--force-confold",
+        sudo=True
+    )
 
 # -------------------------
 # Basic Tools
 # -------------------------
 if confirm("Install git, curl, ufw, ca-certificates?"):
-    run("apt install -y ca-certificates curl gnupg lsb-release ufw git", sudo=True)
+    run(
+        "DEBIAN_FRONTEND=noninteractive "
+        "apt install -y ca-certificates curl gnupg lsb-release ufw git",
+        sudo=True
+    )
 
 # -------------------------
 # Firewall
@@ -89,7 +100,11 @@ if confirm("Install Docker (official repo)?"):
     """, sudo=True)
 
   run("apt update", sudo=True)
-  run("apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin", sudo=True)
+  run(
+        "DEBIAN_FRONTEND=noninteractive "
+        "apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
+        sudo=True
+    )
   run("systemctl enable docker", sudo=True)
   run("systemctl start docker", sudo=True)
 
