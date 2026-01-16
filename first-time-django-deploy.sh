@@ -9,7 +9,7 @@ echo "Make sure:"
 echo "✔ Domain is pointing to VPS IP"
 echo "✔ .env is configured"
 echo "✔ MAKEFILE_ENV=prod"
-echo "✔ AWS S3/DO setup for static and media files
+echo "✔ AWS S3/DO setup for static and media files"
 echo ""
 echo "This script will:"
 echo "1. Start full docker stack (make up)"
@@ -18,8 +18,10 @@ echo "3. Collect static files"
 echo "4. Optional: setup automatic DB backup schedule"
 echo ""
 
+TTY=/dev/tty
+
 confirm () {
-  read -p "$1 (y/n): " ans
+  read -p "$1 (y/n): " ans < $TTY
   [[ "$ans" =~ ^[Yy]$ ]]
 }
 
@@ -28,8 +30,13 @@ if ! confirm "Continue with first-time production deploy?"; then
   exit 0
 fi
 
-read -p "Enter your primary domain (e.g. javasikho.com): " DOMAIN
+read -p "Enter your primary domain (e.g. javasikho.com): " DOMAIN < $TTY
 DOMAIN=$(echo "$DOMAIN" | xargs)
+
+if [[ ! "$DOMAIN" =~ \. ]]; then
+  echo "❌ Invalid domain: $DOMAIN"
+  exit 1
+fi
 
 # -------------------------
 # Step 1 — make up

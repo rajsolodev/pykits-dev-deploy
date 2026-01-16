@@ -5,11 +5,16 @@ echo "========================================"
 echo " VPS BASE SETUP (Ubuntu Only)"
 echo "========================================"
 
+# ---- TTY ----
+TTY=/dev/tty
+
+# ---- Must NOT be root ----
 if [ "$EUID" -eq 0 ]; then
   echo "❌ Do NOT run as root. Use sudo user."
   exit 1
 fi
 
+# ---- OS Check ----
 . /etc/os-release
 
 if [ "$ID" != "ubuntu" ]; then
@@ -17,8 +22,9 @@ if [ "$ID" != "ubuntu" ]; then
   exit 1
 fi
 
+# ---- Helpers ----
 confirm () {
-  read -p "$1 (y/n): " ans
+  read -p "$1 (y/n): " ans < $TTY
   [[ "$ans" =~ ^[Yy]$ ]]
 }
 

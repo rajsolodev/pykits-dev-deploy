@@ -5,6 +5,8 @@ echo "======================================="
 echo "   Pykits SSL Installer (Let's Encrypt)"
 echo "======================================="
 
+TTY=/dev/tty
+
 # ---- Safety Checks ----
 
 if [ ! -f docker-compose.prod.yml ]; then
@@ -17,10 +19,10 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-# ---- User Input ----
+# ---- User Input (TTY SAFE) ----
 
-read -p "Enter domain (example.com): " DOMAIN
-read -p "Enter email for SSL: " EMAIL
+read -p "Enter domain (example.com): " DOMAIN < $TTY
+read -p "Enter email for SSL: " EMAIL < $TTY
 
 DOMAIN=$(echo "$DOMAIN" | xargs)
 EMAIL=$(echo "$EMAIL" | xargs)

@@ -5,19 +5,31 @@ echo "========================================"
 echo " PROJECT SETUP + GITHUB CLONE"
 echo "========================================"
 
+TTY=/dev/tty
+
 if [ "$EUID" -eq 0 ]; then
   echo "❌ Do NOT run as root."
   exit 1
 fi
 
 confirm () {
-  read -p "$1 (y/n): " ans
+  read -p "$1 (y/n): " ans < $TTY
   [[ "$ans" =~ ^[Yy]$ ]]
 }
 
-read -p "Project name (folder): " PROJECT
-read -p "GitHub username/org: " GITHUB_USER
-read -p "Repo name: " REPO_NAME
+# ---- User Input (TTY SAFE) ----
+read -p "Project name (folder): " PROJECT < $TTY
+read -p "GitHub username/org: " GITHUB_USER < $TTY
+read -p "Repo name: " REPO_NAME < $TTY
+
+PROJECT=$(echo "$PROJECT" | xargs)
+GITHUB_USER=$(echo "$GITHUB_USER" | xargs)
+REPO_NAME=$(echo "$REPO_NAME" | xargs)
+
+if [ -z "$PROJECT" ] || [ -z "$GITHUB_USER" ] || [ -z "$REPO_NAME" ]; then
+  echo "❌ All fields are required"
+  exit 1
+fi
 
 TARGET="$HOME/$PROJECT"
 
@@ -34,6 +46,9 @@ chmod 700 "$SSH_DIR"
 if [ ! -f "$KEY_PATH" ]; then
   if confirm "Generate SSH deploy key?"; then
     ssh-keygen -t ed25519 -f "$KEY_PATH" -C "$PROJECT" -N ""
+  else
+    echo "❌ SSH key required to clone via SSH"
+    exit 1
   fi
 fi
 
@@ -49,10 +64,13 @@ Host $HOST_ALIAS
     IdentitiesOnly yes
 EOF
     chmod 600 "$CONFIG"
+  else
+    echo "❌ SSH config entry required"
+    exit 1
   fi
 fi
 
-ssh-keyscan github.com >> "$SSH_DIR/known_hosts"
+ssh-keyscan github.com >> "$SSH_DIR/known_hosts" 2>/dev/null
 
 echo ""
 echo "=============================="
@@ -65,8 +83,9 @@ echo ""
 echo "Repo → Settings → Deploy Keys → Add key → Allow write (if needed)"
 echo ""
 
+# ---- Wait for user confirmation (TTY SAFE) ----
 while true; do
-  read -p "Type CLONE after adding key: " X
+  read -p "Type CLONE after adding key: " X < $TTY
   [ "$X" = "CLONE" ] && break
 done
 

@@ -5,6 +5,8 @@ echo "========================================"
 echo " DOCKER INSTALLER (Official Repo)"
 echo "========================================"
 
+TTY=/dev/tty
+
 if [ "$EUID" -eq 0 ]; then
   echo "❌ Do NOT run as root. Use sudo user."
   exit 1
