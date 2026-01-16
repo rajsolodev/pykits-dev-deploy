@@ -12,12 +12,14 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# ---- Input ----
-read -p "Enter new username: " USERNAME
-read -s -p "Enter password: " PASSWORD
-echo ""
-read -s -p "Confirm password: " PASSWORD2
-echo ""
+TTY=/dev/tty
+
+# ---- Input (TTY SAFE) ----
+read -p "Enter new username: " USERNAME < $TTY
+read -s -p "Enter password: " PASSWORD < $TTY
+echo "" > $TTY
+read -s -p "Confirm password: " PASSWORD2 < $TTY
+echo "" > $TTY
 
 if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
   echo "❌ Username and password required"
@@ -61,5 +63,5 @@ echo "2. Login with new user:"
 echo "   ssh $USERNAME@YOUR_VPS_IP"
 echo ""
 echo "3. Then run VPS setup:"
-echo "   curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps_setup.sh | bash"
+echo "   curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps-base-setup.sh | bash"
 echo ""
