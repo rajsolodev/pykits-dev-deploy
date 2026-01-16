@@ -89,24 +89,16 @@ while true; do
   [ "$X" = "CLONE" ] && break
 done
 
-echo "Testing SSH..."
-set +e
-ssh -T "$HOST_ALIAS"
-RES=$?
-set -e
-
-if [ "$RES" -ne 1 ]; then
-  echo "❌ SSH failed"
-  exit 1
-fi
-
 REPO_URL="git@$HOST_ALIAS:$GITHUB_USER/$REPO_NAME.git"
 
 if [ -d "$TARGET" ]; then
   echo "Folder already exists: $TARGET"
 else
-  git clone "$REPO_URL" "$TARGET"
+  echo "Cloning repository..."
+  git clone "$REPO_URL" "$TARGET" || {
+    echo "❌ Git clone failed. Check if deploy key is added correctly."
+    exit 1
+  }
 fi
-
 echo ""
 echo "✅ Project cloned to $TARGET"
