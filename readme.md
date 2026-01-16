@@ -17,7 +17,8 @@ Actual application deployment depends on your project framework
 This repo helps you to:
 
 - Create a secure sudo user
-- Setup firewall (UFW) and Allow Ports 80, 443
+- Setup firewall (UFW) and allow ports 22, 80, 443
+- Install basic system tools (git, curl, make, etc.)
 - Install Docker (official repository)
 - Setup SSH deploy key for private GitHub repo
 - Clone your actual project into home directory
@@ -48,6 +49,8 @@ Providers tested:
 - Hostinger VPS
 - Vultr / Hetzner
 
+> ⚠ Only Ubuntu is supported. Other distros are intentionally not supported.
+
 ---
 
 ## 🧱 Architecture
@@ -61,10 +64,12 @@ You will use **two repositories**:
 Contains only infrastructure scripts:
 
     pykits-dev-deploy/
-    ├── create_sudo_user.py
-    ├── vps_setup.py
+    ├── create-user.sh
+    ├── vps-base-setup.sh
+    ├── install-docker.sh
+    ├── project-setup.sh
+    └── ssl.sh
 
-Safe to keep public.
 No secrets. No project code.
 
 ---
@@ -80,7 +85,6 @@ Contains:
 - Makefile
 - Django/FastAPI/Node code
 - Framework-specific deployment scripts like (if needed):
-  - `first_time_deploy.py`
   - `setup_db_backup_schedule.py`
 
 ---
@@ -99,19 +103,10 @@ ssh root@YOUR_VPS_IP
 
 ---
 
-### STEP 2 --- Install minimal tools
+### STEP 2 --- Create secure sudo user
 
 ```bash
-apt update
-apt install -y git python3
-```
-
----
-
-### STEP 3 --- Create secure sudo deploy user
-
-```bash
-curl -fsSL "https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create_sudo_user.py?$(date +%s)" | python3
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create-user.sh | bash
 ```
 
 You will be asked to:
@@ -123,28 +118,47 @@ After success:
 
 ```bash
 exit
-ssh username@YOUR_VPS_IP
+ssh new_user@YOUR_VPS_IP
 ```
 
 ---
 
-
-### STEP 5 --- Setup VPS + Auto Clone PRIVATE project repo
+### STEP 3 --- Base VPS Setup (Firewall + Tools)
 
 Login as new user, then:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps_setup.py?$(date +%s)" | python3
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps-base-setup.sh | bash
 ```
 
 This script will:
+- Run system update (optional)
+- Install basic tools (git, python3, make etc)
+- Configure UFW firewall
+- Allow ports 22, 80, 443
 
-- Update system
-- Setup firewall (UFW)
-- Install Docker (official)
-- Setup GitHub SSH deploy key
-- Ask for your private repo URL
-- Clone project into: `home/username/PROJECT_NAME`
+---
+
+### STEP 4 — Install Docker (If Not Already Installed)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/install-docker.sh | bash
+```
+After this:
+
+👉 Logout & login again so docker group applies.
+
+---
+
+### STEP 5 — Setup Project & Clone Repo
+```bash
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/project-setup.sh | bash
+```
+This will:
+- Generate SSH deploy key
+- Ask you to add it to GitHub Deploy Keys
+- Test SSH connection
+- Clone your private repo into: /home/USER/PROJECT_NAME
 
 ---
 
@@ -173,7 +187,7 @@ Each guide explains:
 - Docker runs under deploy user
 - Firewall blocks all unused ports
 - SSH deploy keys are project-specific
-- Database backups can be automated to cloud storage
+- No secrets stored in public repo
 
 ---
 
@@ -195,3 +209,13 @@ This deployment flow is designed to support:
 - Docker-based production stacks
 
 Feel free to adapt this for your own projects.
+
+## 🆘 Troubleshooting
+  Containers not starting
+    - Check logs: `make logs`
+    - Check Container Online: `make ps-all`
+
+  Domain not working on HTTPS:
+  Verify:
+    - DNS A-record points to VPS IP
+    - Port 80 and 443 open: `sudo ufw status`

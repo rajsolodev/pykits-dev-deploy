@@ -86,13 +86,20 @@ if confirm "Install Docker (official repo)?"; then
 
   UBUNTU_CODENAME=$(lsb_release -cs)
 
+  # Docker officially supports LTS releases
+  if [[ "$UBUNTU_CODENAME" != "jammy" && "$UBUNTU_CODENAME" != "noble" ]]; then
+    echo "⚠ Ubuntu $UBUNTU_CODENAME not officially supported by Docker repo."
+    echo "➡ Falling back to jammy (22.04 LTS) repo."
+    UBUNTU_CODENAME="jammy"
+  fi
+
   run "cat > /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $UBUNTU_CODENAME
-Components: stable
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF"
+    Types: deb
+    URIs: https://download.docker.com/linux/ubuntu
+    Suites: $UBUNTU_CODENAME
+    Components: stable
+    Signed-By: /etc/apt/keyrings/docker.asc
+    EOF"
 
   run "apt update"
   run "DEBIAN_FRONTEND=noninteractive apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
