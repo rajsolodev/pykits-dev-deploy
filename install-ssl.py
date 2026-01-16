@@ -5,17 +5,22 @@ import subprocess
 from pathlib import Path
 
 # -------------------------
-# TTY PROMPT HELPERS
+# SAFE PROMPT (STDIN or TTY)
 # -------------------------
 
-def tty_input(prompt: str) -> str:
+def prompt(msg: str) -> str:
+    # Prefer stdin if it's a TTY
+    if sys.stdin.isatty():
+        return input(msg).strip()
+
+    # Fallback to /dev/tty
     try:
         with open("/dev/tty", "r+") as tty:
-            tty.write(prompt)
+            tty.write(msg)
             tty.flush()
             return tty.readline().strip()
     except Exception:
-        print("❌ No TTY available for input.")
+        print("❌ No interactive terminal available for input.")
         sys.exit(1)
 
 
@@ -49,11 +54,11 @@ if subprocess.run("docker info > /dev/null 2>&1", shell=True).returncode != 0:
     sys.exit(1)
 
 # -------------------------
-# PROMPT (TTY SAFE)
+# PROMPT
 # -------------------------
 
-DOMAIN = tty_input("Enter domain (example.com): ").strip()
-EMAIL = tty_input("Enter email for SSL: ").strip()
+DOMAIN = prompt("Enter domain (example.com): ")
+EMAIL = prompt("Enter email for SSL: ")
 
 if "." not in DOMAIN:
     print(f"❌ Invalid domain: {DOMAIN}")
@@ -64,12 +69,12 @@ CONF_DIR.mkdir(parents=True, exist_ok=True)
 
 COMPOSE = "docker compose -f docker-compose.prod.yml"
 
-# # -------------------------
-# # Issue Certificate
-# # -------------------------
+# -------------------------
+# Issue Certificate
+# -------------------------
 
 print("\n▶ Issuing SSL certificate...")
-# print("---------------------------------------")
+print("---------------------------------------")
 
 # cert_cmd = (
 #     f'{COMPOSE} run --rm --entrypoint "" certbot certbot certonly '
@@ -146,7 +151,7 @@ run(f"{COMPOSE} restart nginx")
 print("\n▶ Testing auto-renew (dry run)...")
 print("---------------------------------------")
 
-# run(f'{COMPOSE} run --rm --entrypoint "" certbot certbot renew --dry-run', check=False)
+#run(f'{COMPOSE} run --rm --entrypoint "" certbot certbot renew --dry-run', check=False)
 
 # -------------------------
 # Done
