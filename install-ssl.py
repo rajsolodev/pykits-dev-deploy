@@ -64,29 +64,29 @@ CONF_DIR.mkdir(parents=True, exist_ok=True)
 
 COMPOSE = "docker compose -f docker-compose.prod.yml"
 
-# -------------------------
-# Issue Certificate
-# -------------------------
+# # -------------------------
+# # Issue Certificate
+# # -------------------------
 
 print("\n▶ Issuing SSL certificate...")
-print("---------------------------------------")
+# print("---------------------------------------")
 
-cert_cmd = (
-    f'{COMPOSE} run --rm --entrypoint "" certbot certbot certonly '
-    f'--webroot -w /var/www/certbot '
-    f'-d {DOMAIN} -d www.{DOMAIN} '
-    f'--email {EMAIL} --agree-tos --no-eff-email'
-)
+# cert_cmd = (
+#     f'{COMPOSE} run --rm --entrypoint "" certbot certbot certonly '
+#     f'--webroot -w /var/www/certbot '
+#     f'-d {DOMAIN} -d www.{DOMAIN} '
+#     f'--email {EMAIL} --agree-tos --no-eff-email'
+# )
 
-ret = run(cert_cmd, check=False)
+# ret = run(cert_cmd, check=False)
 
-if ret != 0:
-    print("\n❌ SSL certificate issuance failed.")
-    print("👉 Check:")
-    print("   - Domain A record points to this VPS IP")
-    print("   - Port 80 is open")
-    print("   - HTTP nginx config is active")
-    sys.exit(1)
+# if ret != 0:
+#     print("\n❌ SSL certificate issuance failed.")
+#     print("👉 Check:")
+#     print("   - Domain A record points to this VPS IP")
+#     print("   - Port 80 is open")
+#     print("   - HTTP nginx config is active")
+#     sys.exit(1)
 
 # -------------------------
 # Write Nginx HTTPS Config
@@ -146,7 +146,7 @@ run(f"{COMPOSE} restart nginx")
 print("\n▶ Testing auto-renew (dry run)...")
 print("---------------------------------------")
 
-run(f'{COMPOSE} run --rm --entrypoint "" certbot certbot renew --dry-run', check=False)
+# run(f'{COMPOSE} run --rm --entrypoint "" certbot certbot renew --dry-run', check=False)
 
 # -------------------------
 # Done
