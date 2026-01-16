@@ -100,13 +100,14 @@ This is the **exact flow on a fresh VPS**.
 ```bash
 ssh root@YOUR_VPS_IP
 ```
+then run `apt update & apt upgrade -y`
 
 ---
 
 ### STEP 2 --- Create secure sudo user
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create-user.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create-sudo-user.sh | bash
 ```
 
 You will be asked to:
@@ -132,6 +133,7 @@ curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/v
 ```
 
 This script will:
+
 - Run system update (optional)
 - Install basic tools (git, python3, make etc)
 - Configure UFW firewall
@@ -144,6 +146,7 @@ This script will:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/install-docker.sh | bash
 ```
+
 After this:
 
 👉 Logout & login again so docker group applies.
@@ -151,10 +154,13 @@ After this:
 ---
 
 ### STEP 5 — Setup Project & Clone Repo
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/project-setup.sh | bash
 ```
+
 This will:
+
 - Generate SSH deploy key
 - Ask you to add it to GitHub Deploy Keys
 - Test SSH connection
@@ -211,6 +217,7 @@ This deployment flow is designed to support:
 Feel free to adapt this for your own projects.
 
 ## 🆘 Troubleshooting
+
   Containers not starting
     - Check logs: `make logs`
     - Check Container Online: `make ps-all`
