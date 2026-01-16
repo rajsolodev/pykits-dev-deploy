@@ -65,10 +65,10 @@ if confirm("Run system update & upgrade?"):
 # -------------------------
 # Basic Tools
 # -------------------------
-if confirm("Install git, curl, ufw, ca-certificates?"):
+if confirm("Install git, curl, ufw, ca-certificates, make?"):
     run(
         "DEBIAN_FRONTEND=noninteractive "
-        "apt install -y ca-certificates curl gnupg lsb-release ufw git",
+        "apt install -y ca-certificates curl gnupg lsb-release ufw git make",
         sudo=True
     )
 
