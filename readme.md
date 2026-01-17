@@ -133,10 +133,11 @@ ssh new_user@YOUR_VPS_IP
 Login as new user, then:
 
 ```bash
-ctmp=$(mktemp) && \
+tmp=$(mktemp) && \
 curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps-base-setup.sh -o "$tmp" && \
 trap 'rm -f "$tmp"' EXIT && \
 bash "$tmp"
+
 ```
 
 This script will:
@@ -188,7 +189,9 @@ Change Directory to Project Folder
 ```bash
 cd project_folder_name
 ```
+
 then run below in terminal:
+
 ```bash
 tmp=$(mktemp) && \
 curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/setup-http-nginx.sh -o "$tmp" && \
