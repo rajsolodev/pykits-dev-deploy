@@ -10,6 +10,7 @@ create-sudo-user.sh
 vps-base-setup.sh
 install-docker.sh
 project-setup.sh
+setup-http-nginx.sh
 ```
 
 And your project must be cloned into:: `/home/USER/PROJECT_NAME`
@@ -73,7 +74,25 @@ This will:
 
 ---
 
-Step 4 — Schedule Automatic Database Backup (Optional but Recommended)
+### Step 5 - Change CSRF_TRUSTED_ORIGINS (Only If HTTPS Enabled)
+
+- Edit .env
+
+  ```bash
+  cd project_folder_name
+  nano .env
+  ```
+
+  Change http to https in domain as below
+  `CSRF_TRUSTED_ORIGINS=https://example.com,https://www.example.com`
+
+- re-deploy new changes
+  ```bash
+    make deploy
+  ```
+---
+
+### Step 6 — Schedule Automatic Database Backup (Optional but Recommended)
 
 - `cd project_folder`
 - Create Super user `make superuser`

@@ -210,7 +210,6 @@ This will:
 - Create an HTTP Nginx config (default.conf) for your site
 - Route traffic from port 80 → your app container
 - Enable access to /.well-known/acme-challenge/ for SSL verification
-- Reload Nginx to apply the new configuration
 
 ---
 
