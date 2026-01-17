@@ -100,6 +100,7 @@ This is the **exact flow on a fresh VPS**.
 ```bash
 ssh root@YOUR_VPS_IP
 ```
+
 then run `apt update & apt upgrade -y`
 
 ---
@@ -107,7 +108,10 @@ then run `apt update & apt upgrade -y`
 ### STEP 2 --- Create secure sudo user
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create-sudo-user.sh | bash
+tmp=$(mktemp) && \
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/create-sudo-user.sh -o "$tmp" && \
+trap 'rm -f "$tmp"' EXIT && \
+bash "$tmp"
 ```
 
 You will be asked to:
@@ -129,7 +133,10 @@ ssh new_user@YOUR_VPS_IP
 Login as new user, then:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps-base-setup.sh | bash
+ctmp=$(mktemp) && \
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/vps-base-setup.sh -o "$tmp" && \
+trap 'rm -f "$tmp"' EXIT && \
+bash "$tmp"
 ```
 
 This script will:
@@ -144,7 +151,10 @@ This script will:
 ### STEP 4 — Install Docker (If Not Already Installed)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/install-docker.sh | bash
+tmp=$(mktemp) && \
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/install-docker.sh -o "$tmp" && \
+trap 'rm -f "$tmp"' EXIT && \
+bash "$tmp"
 ```
 
 After this:
@@ -156,7 +166,10 @@ After this:
 ### STEP 5 — Setup Project & Clone Repo
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/project-setup.sh | bash
+tmp=$(mktemp) && \
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/project-setup.sh -o "$tmp" && \
+trap 'rm -f "$tmp"' EXIT && \
+bash "$tmp"
 ```
 
 This will:
@@ -165,6 +178,31 @@ This will:
 - Ask you to add it to GitHub Deploy Keys
 - Test SSH connection
 - Clone your private repo into: /home/USER/PROJECT_NAME
+
+---
+
+### STEP 6 — Setup HTTP Nginx
+
+Change Directory to Project Folder
+
+```bash
+cd project_folder_name
+```
+then run below in terminal:
+```bash
+tmp=$(mktemp) && \
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/setup-http-nginx.sh -o "$tmp" && \
+trap 'rm -f "$tmp"' EXIT && \
+bash "$tmp"
+```
+
+This will:
+
+- Ask for your domain name (e.g. example.com)
+- Create an HTTP Nginx config (default.conf) for your site
+- Route traffic from port 80 → your app container
+- Enable access to /.well-known/acme-challenge/ for SSL verification
+- Reload Nginx to apply the new configuration
 
 ---
 

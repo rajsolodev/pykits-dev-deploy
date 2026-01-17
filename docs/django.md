@@ -5,15 +5,12 @@ This guide explains how to deploy Django projects after VPS setup is complete.
 Prerequisite:
 You must have already completed VPS setup using the public installers:
 
-From root:
-
-- `create-user.sh`
-
-From deploy user:
-
-- `vps-base-setup.sh`
-- `install-docker.sh` (if Docker was not already installed)
-- `project-setup.sh`
+```bash
+create-sudo-user.sh
+vps-base-setup.sh
+install-docker.sh
+project-setup.sh
+```
 
 And your project must be cloned into:: `/home/USER/PROJECT_NAME`
 
@@ -31,6 +28,7 @@ Create your `.env` file: `cp .env.example .env`
 Open and configure all required values: `nano .env`
 
 Make sure these are correctly set:
+
 - MAKEFILE_ENV=prod
 - SECRET_KEY
 - Database credentials
@@ -39,29 +37,35 @@ Make sure these are correctly set:
 - Any third-party API keys
   ⚠ Do not skip any required env values — production containers may fail silently.
 
-### Step 3 — First Time Deploy
+### Step 3 —  Deploy Project
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/first-time-django-deploy.sh | bash
+cd project_folder
+make deploy
 ```
 
 This will:
 
-- Start full Docker stack (make up)
-- Run database migrations
+- Git Pull
+- Start full Docker stack
 - Run database migrations
 - Collect static files on Cloud
-- Optionally setup automatic DB backup schedule (Celery Beat)
-  🔐 HTTPS is enabled separately using the SSL installer script.
+
+*Your Site must be running on HTTP Now check your site url (http://example.com) on any browser, make sure there is no https (https://example.com).*
 
 ### Step 4 — Enable HTTPS (Recommended)
+
 After your site is reachable on HTTP and domain is pointing to VPS IP:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/install-ssl.sh | bash
+tmp=$(mktemp) && \
+curl -fsSL https://raw.githubusercontent.com/rajsolodev/pykits-dev-deploy/main/install-ssl.sh -o "$tmp" && \
+trap 'rm -f "$tmp"' EXIT && \
+bash "$tmp"
 ```
 
 This will:
+
 - Issue Let's Encrypt certificate
 - Switch Nginx to HTTPS
 - Enable HTTP → HTTPS redirect
@@ -69,9 +73,38 @@ This will:
 
 ---
 
+Step 4 — Schedule Automatic Database Backup (Optional but Recommended)
+
+- `cd project_folder`
+- Create Super user `make superuser`
+  - Remember Superuser can not purchase any product on website means cant act as customer. User registered through website's Registration Page are customers can make purchase.
+- Visit Admin URL on browser, check main `url.py` to find out admin url
+- Login using Admin Credentials
+- In the Periodic Tasks, Click on Crontabs -> Add crontab
+  ```
+  Minutes: 0
+  Hours: 2
+  Day_of_month: *
+  Month_of_year: *
+  Day_of_week: *
+  Cron Timezone: UTC
+  ```
+- Save
+- In the Periodic Tasks, Click on Periodic Tasks -> Add Periodic Tasks
+  ```
+  Name: Database backup on cloud every night 2AM
+  Tasks (registered): select "core.tasks.run_db_backup"
+  Enable: Checked
+  Crontab Schedule: select "0 2 * * * (m/h/dM/MY/d) UTC" 
+  ```
+- Save
+  *Note: You can create your own crontab of your specific time.*
+
+---
+
 ## 🔁 FUTURE DEPLOYMENTS
 
-For future updates, just run:
+For future updates, If Later, you make any code change and push it to github just run:
 
 ```bash
 make deploy
@@ -110,6 +143,7 @@ After first deploy:
 ---
 
 ## 🆘 Troubleshooting
+
   Containers not starting / Site Not Loading
     - Check Container Online: `make ps-all`
     - Check Django logs: `make django-logs`
