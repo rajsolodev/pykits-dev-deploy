@@ -162,6 +162,11 @@ After this:
 
 👉 Logout & login again so docker group applies.
 
+```bash
+exit
+ssh newuser@VPS_IP
+```
+
 ---
 
 ### STEP 5 — Setup Project & Clone Repo

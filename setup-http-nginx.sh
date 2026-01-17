@@ -63,16 +63,10 @@ EOF
 
 echo "✅ default.conf created at $CONF_DIR/default.conf"
 
-# ---- Start / Reload Nginx ----
-
-echo ""
-echo "▶ Reloading Nginx..."
-echo "---------------------------------------"
-
-$COMPOSE up -d nginx
-$COMPOSE exec nginx nginx -s reload || $COMPOSE restart nginx
-
 echo ""
 echo "======================================="
-echo "✅ HTTP Nginx Configured Successfully"
+echo "✅ HTTP Nginx config ready"
+echo "➡ Now run: make deploy   (or docker compose up -d)"
+echo "➡ Then test: http://$DOMAIN"
+echo "➡ After that: run install-ssl.sh for HTTPS"
 echo "======================================="
