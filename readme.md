@@ -99,9 +99,8 @@ This is the **exact flow on a fresh VPS**.
 
 ```bash
 ssh root@YOUR_VPS_IP
+apt update & apt upgrade -y
 ```
-
-then run `apt update & apt upgrade -y`
 
 ---
 
