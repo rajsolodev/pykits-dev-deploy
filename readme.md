@@ -206,7 +206,9 @@ bash "$tmp"
 This will:
 
 - Ask for your domain name (e.g. example.com)
-- Create an HTTP Nginx config (default.conf) for your site
+- Ask internal service name, which you can get from docker-compose file(e.g. app or api or nextjs)
+- Ask internal port (e.g. 8000 or 3000)
+- Create an HTTP Nginx config (`<DOMAIN>`.conf) for your site
 - Route traffic from port 80 → your app container
 - Enable access to /.well-known/acme-challenge/ for SSL verification
 
@@ -218,8 +220,8 @@ After VPS setup, deployment depends on your project framework.
 
 Follow the appropriate guide:
 
-- 🟢 Django Projects → [docs/django-deploy.md](https://github.com/rajsolodev/pykits-dev-deploy/blob/main/docs/django.md)
-- 🔵 FastAPI Projects → Coming soon
+- 🟢 Django Projects → [docs/django.md](https://github.com/rajsolodev/pykits-dev-deploy/blob/main/docs/django.md)
+- 🔵 FastAPI Projects → [docs/fastapi.md](https://github.com/rajsolodev/pykits-dev-deploy/blob/main/docs/fastapi.md)
 - 🟣 Node.js Projects → coming soon
 
 Each guide explains:
