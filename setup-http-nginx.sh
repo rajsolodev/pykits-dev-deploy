@@ -29,6 +29,12 @@ if [[ ! "$DOMAIN" =~ \. ]]; then
   exit 1
 fi
 
+read -p "Enter internal service name (e.g., api or nextjs): " SERVICE < $TTY
+SERVICE=$(echo "$SERVICE" | xargs)
+
+read -p "Enter internal port (e.g., 8000 or 3000): " PORT < $TTY
+PORT=$(echo "$PORT" | xargs)
+
 CONF_DIR="deploy/nginx/conf.d"
 COMPOSE="docker compose -f docker-compose.prod.yml"
 
@@ -37,22 +43,26 @@ mkdir -p "$CONF_DIR"
 # ---- Create HTTP Config ----
 
 echo ""
-echo "▶ Creating HTTP Nginx config..."
+echo "▶ Creating HTTP Nginx config for $DOMAIN ($SERVICE:$PORT)..."
 echo "---------------------------------------"
 
-rm -f "$CONF_DIR"/*.conf
-
-cat > "$CONF_DIR/default.conf" <<EOF
+cat > "$CONF_DIR/$DOMAIN.conf" <<EOF
 server {
     listen 80;
-    server_name $DOMAIN www.$DOMAIN;
+    server_name www.$DOMAIN;
+    return 301 \$scheme://$DOMAIN\$request_uri;
+}
+
+server {
+    listen 80;
+    server_name $DOMAIN;
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
 
     location / {
-        proxy_pass http://app:8000;
+        proxy_pass http://$SERVICE:$PORT;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -61,12 +71,12 @@ server {
 }
 EOF
 
-echo "✅ default.conf created at $CONF_DIR/default.conf"
+echo "✅ $DOMAIN.conf created at $CONF_DIR/$DOMAIN.conf"
 
 echo ""
 echo "======================================="
 echo "✅ HTTP Nginx config ready"
-echo "➡ Now run: make deploy   (or docker compose up -d)"
+echo "➡ Now run: make deploy"
 echo "➡ Then test: http://$DOMAIN"
 echo "➡ After that: run install-ssl.sh for HTTPS"
 echo "======================================="
