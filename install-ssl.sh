@@ -2,74 +2,48 @@
 set -e
 
 echo "======================================="
-echo "   Pykits SSL Installer (Let's Encrypt)"
+echo "   Generic SSL Installer (Certbot + Nginx)"
 echo "======================================="
 
 TTY=/dev/tty
 
 # ---- Safety Checks ----
+FILE_COMPOSE="docker-compose.prod.yml"
+if [ ! -f "$FILE_COMPOSE" ]; then
+    read -p "Enter docker-compose file name (default: docker-compose.prod.yml): " INPUT_COMPOSE < $TTY
+    FILE_COMPOSE=${INPUT_COMPOSE:-$FILE_COMPOSE}
+fi
 
-if [ ! -f docker-compose.prod.yml ]; then
-  echo "❌ Run this from project root (docker-compose.prod.yml not found)"
+if [ ! -f "$FILE_COMPOSE" ]; then
+  echo "❌ $FILE_COMPOSE not found"
   exit 1
 fi
 
-if ! docker info >/dev/null 2>&1; then
-  echo "❌ Docker is not running"
-  exit 1
-fi
-
-# ---- User Input (TTY SAFE) ----
-
-read -p "Enter domain (example.com): " DOMAIN < $TTY
+# ---- User Input ----
+read -p "Enter target domain (e.g., javasikho.com): " DOMAIN < $TTY
 read -p "Enter email for SSL: " EMAIL < $TTY
+read -p "Enter internal service name (e.g., api or nextjs): " SERVICE < $TTY
+read -p "Enter internal port (e.g., 8000 or 3000): " PORT < $TTY
 
+# Clean inputs
 DOMAIN=$(echo "$DOMAIN" | xargs)
-EMAIL=$(echo "$EMAIL" | xargs)
-
-if [[ ! "$DOMAIN" =~ \. ]]; then
-  echo "❌ Invalid domain: $DOMAIN"
-  exit 1
-fi
+SERVICE=$(echo "$SERVICE" | xargs)
+PORT=$(echo "$PORT" | xargs)
+CONFIG_FILENAME="$DOMAIN.conf"
 
 CONF_DIR="deploy/nginx/conf.d"
-COMPOSE="docker compose -f docker-compose.prod.yml"
+COMPOSE="docker compose -f $FILE_COMPOSE"
 
-# ---- Issue Certificate (HTTP config must exist) ----
-
-echo ""
-echo "▶ Issuing SSL certificate..."
-echo "---------------------------------------"
-
+# ---- Issue Certificate ----
+echo "▶ Issuing certificate for $DOMAIN and www.$DOMAIN..."
 $COMPOSE run --rm --entrypoint "" certbot certbot certonly \
   --webroot -w /var/www/certbot \
   -d "$DOMAIN" -d "www.$DOMAIN" \
   --email "$EMAIL" --agree-tos --no-eff-email
 
-# ---- Switch Nginx to HTTPS ----
-
-echo ""
-echo "▶ Switching Nginx to HTTPS..."
-echo "---------------------------------------"
-
-rm -f "$CONF_DIR"/*.conf
-
-cat > "$CONF_DIR/ssl.conf" <<EOF
-server {
-    listen 443 ssl;
-    server_name $DOMAIN www.$DOMAIN;
-
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
-
-    location / {
-        proxy_pass http://app:8000;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-}
-
+# ---- Generate Nginx Config ----
+echo "▶ Generating config: $CONF_DIR/$CONFIG_FILENAME..."
+cat > "$CONF_DIR/$CONFIG_FILENAME" <<EOF
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
@@ -82,29 +56,27 @@ server {
         return 301 https://\$host\$request_uri;
     }
 }
+
+server {
+    listen 443 ssl;
+    server_name $DOMAIN www.$DOMAIN;
+
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
+
+    location / {
+        proxy_pass http://$SERVICE:$PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
 EOF
 
-# ---- Restart Nginx ----
+# ---- Reload Nginx ----
+echo "▶ Reloading Nginx..."
+$COMPOSE exec nginx nginx -s reload
 
-echo ""
-echo "▶ Restarting Nginx..."
-echo "---------------------------------------"
-
-$COMPOSE restart nginx
-
-# ---- Test Auto Renew ----
-
-echo ""
-echo "▶ Testing auto-renew (dry run)..."
-echo "---------------------------------------"
-
-$COMPOSE run --rm --entrypoint "" certbot certbot renew --dry-run
-
-# ---- Done ----
-
-echo ""
-echo "======================================="
-echo "✅ HTTPS ENABLED SUCCESSFULLY"
-echo "🔒 https://$DOMAIN"
-echo "♻ Auto-renew verified"
-echo "======================================="
+echo "✅ SUCCESS: HTTPS enabled for $DOMAIN"
+echo "📂 Config saved to: $CONF_DIR/$CONFIG_FILENAME"
