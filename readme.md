@@ -95,7 +95,30 @@ This is the **exact flow on a fresh VPS**.
 
 ---
 
-### STEP 1 --- Login to VPS as root
+### STEP 1 --- Buy VPS & Domain
+
+You can use any service provider of your choice. If you haven't bought one yet, we suggest using our referral links to get exclusive discounts:
+
+- **DigitalOcean** — Get **$200 Free Credits**: [https://pykits.dev/s/do-pykits](https://pykits.dev/s/do-pykits)
+- **Hostinger** — Get **20% OFF**: [https://pykits.dev/s/h-pykits](https://pykits.dev/s/h-pykits)
+
+Once you have your VPS IP and Domain, proceed to the next step.
+
+*Note - No need to apply any additional coupon code to avail discount offers, Just click on above links and proceed to buy that's it.*
+
+---
+
+### STEP 2 --- Point VPS IP to Domain
+
+To connect your domain to your VPS, you need to configure your DNS settings (e.g., in Cloudflare, DigitalOcean, or Hostinger):
+
+1. **A Record**: Add an `A` record with host `@` pointing to your **VPS IP**.
+2. **Subdomain (Optional)**: If you need a subdomain (e.g. `api.yourdomain.com`), add an `A` record with host `api` pointing to your **VPS IP**.
+3. **WWW Redirect**: Add a `CNAME` record for `www` pointing to `@` to ensure `www.yourdomain.com` redirects to your main domain.
+
+---
+
+### STEP 3 --- Login to VPS as root
 
 ```bash
 ssh root@YOUR_VPS_IP
@@ -104,7 +127,7 @@ apt update & apt upgrade -y
 
 ---
 
-### STEP 2 --- Create secure sudo user
+### STEP 4 --- Create secure sudo user
 
 ```bash
 tmp=$(mktemp) && \
@@ -127,7 +150,7 @@ ssh new_user@YOUR_VPS_IP
 
 ---
 
-### STEP 3 --- Base VPS Setup (Firewall + Tools)
+### STEP 5 --- Base VPS Setup (Firewall + Tools)
 
 Login as new user, then:
 
@@ -148,7 +171,7 @@ This script will:
 
 ---
 
-### STEP 4 — Install Docker (If Not Already Installed)
+### STEP 6 — Install Docker (If Not Already Installed)
 
 ```bash
 tmp=$(mktemp) && \
@@ -168,7 +191,7 @@ ssh newuser@VPS_IP
 
 ---
 
-### STEP 5 — Setup Project & Clone Repo
+### STEP 7 — Setup Project & Clone Repo
 
 ```bash
 tmp=$(mktemp) && \
@@ -186,7 +209,7 @@ This will:
 
 ---
 
-### STEP 6 — Setup HTTP Nginx
+### STEP 8 — Setup HTTP Nginx
 
 Change Directory to Project Folder
 
@@ -222,7 +245,7 @@ Follow the appropriate guide:
 
 - 🟢 Django Projects → [docs/django.md](https://github.com/rajsolodev/pykits-dev-deploy/blob/main/docs/django.md)
 - 🔵 FastAPI Projects → [docs/fastapi.md](https://github.com/rajsolodev/pykits-dev-deploy/blob/main/docs/fastapi.md)
-- 🟣 Node.js Projects → coming soon
+- 🟣 Nextjs Projects → [docs/nextjs.md](https://github.com/rajsolodev/pykits-dev-deploy/blob/main/docs/nextjs.md)
 
 Each guide explains:
 
