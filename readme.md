@@ -64,11 +64,13 @@ You will use **two repositories**:
 Contains only infrastructure scripts:
 
     pykits-dev-deploy/
-    ├── create-user.sh
+    ├── create-sudo-user.sh
     ├── vps-base-setup.sh
     ├── install-docker.sh
     ├── project-setup.sh
-    └── ssl.sh
+    ├── setup-http-nginx.sh
+    ├── install-ssl.sh
+    └── vps_setup.sh
 
 No secrets. No project code.
 
