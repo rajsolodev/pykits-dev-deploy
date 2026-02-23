@@ -54,7 +54,16 @@ This will:
 
 *Your Site must be running on HTTP Now check your site url (http://example.com) on any browser, make sure there is no https (https://example.com).*
 
-### Step 4 — Enable HTTPS (Recommended)
+### Step 4 — Management Commands
+
+Use the `manage` script (via `make` or `uv`) for administrative tasks:
+
+- `make manage c="makeroles"`: Seed default roles.
+- `make manage c="makepermissions"`: Discover and seed perms from routers.
+- `make manage c="makerolepermissions"`: Map permissions to roles automatically.
+- `make manage c="createsuperadmin"`: Initialize a super user.
+
+### Step 5 — Enable HTTPS (Recommended)
 
 After your site is reachable on HTTP and domain is pointing to VPS IP:
 
@@ -74,7 +83,7 @@ This will:
 
 ---
 
-### Step 5 - Change CSRF_TRUSTED_ORIGINS (Only If HTTPS Enabled)
+### Step 6 - Change CSRF_TRUSTED_ORIGINS (Only If HTTPS Enabled)
 
 - Edit .env
 
@@ -93,12 +102,22 @@ This will:
 
 ---
 
+### Step 7 — Database & Redis Access (Production)
+
+For direct access to your database or cache in production:
+
+- `make db-cli`: Open PostgreSQL CLI (asks for username).
+- `make redis-cli`: Open Redis CLI (asks for username/password).
+
+---
+
 ## 🔁 FUTURE DEPLOYMENTS
 
 For future updates, If Later, you make any code change and push it to github just run:
 
 ```bash
 make deploy
+make nginx-reload OR make nginx-restart
 ```
 
 This will safely:
@@ -107,6 +126,7 @@ This will safely:
 - Rebuild containers
 - Apply migrations
 - Collect static files
+- Restart or Reload Nginx
 
 Zero infra work needed.
 
@@ -126,7 +146,7 @@ Zero infra work needed.
 
 After first deploy:
 
-- Create FastAPI superuser `uv run manage createsuperadmin`
+- Create FastAPI superuser `make manage c="createsuperadmin"`
 - Verify SSL auto-renewal
 - Verify database backups in cloud storage
 - Test restore process once on staging
@@ -135,13 +155,16 @@ After first deploy:
 
 ## 🆘 Troubleshooting
 
-  Containers not starting / Site Not Loading
-    - Check Container Online: `make ps-all`
-    - Check FastAPI logs: `make django-logs`
-    - Check Celery logs: `make celery-logs`
-    - Check Celery beat logs: `make celery-beat-logs`
+#### Containers not starting / Site Not Loading
+
+* Check Container Online: `make ps-all`
+* Check FastAPI logs: `make fastapi-logs`
+* Check Celery logs: `make celery-logs`
+* Check Celery beat logs: `make celery-beat-logs`
+* Check Nginx Logs: `make nginx-logs`
 
   Domain not working on HTTPS:
   Verify:
-    - DNS A-record points to VPS IP
-    - Port 80 and 443 open: `sudo ufw status`
+
+  - DNS A-record points to VPS IP
+  - Port 80 and 443 open: `sudo ufw status`
